@@ -15,7 +15,7 @@ class MultiHeadAttention(nn.Module):
         self.head = n_head
         self.linear_q = nn.Linear(n_feat, n_feat)
         self.linear_k = nn.Linear(n_feat, n_feat)
-        self.linear_v = nn.Linear(n_feat, n_feat)
+        self.linear_v = nn.Linear(n_feat, 1)
         self.linear_output = nn.Linear(n_feat, n_feat)
         self.attention = None
         self.dropout = nn.Dropout(p = dropout_rate)
@@ -24,14 +24,13 @@ class MultiHeadAttention(nn.Module):
 
         # first, transform q, k v
         n_batch = q.size(0)
-        q = self.linear_q(q).view(n_batch , -1, self.h , self.dim)
-        k = self.linear_q(k).view(n_batch, -1, self.h, self.dim)
-        v = self.linear_q(v).view(n_batch, -1, self.h, self.dim)
+        q = self.linear_q(q).view(n_batch , -1, self.head , self.dim)
+        k = self.linear_q(k).view(n_batch, -1, self.head, self.dim)
+        v = self.linear_q(v).view(n_batch, -1, self.head, self.dim)
 
         q = q.transpose(1, 2) # now, (batch, head, time, dim)
         k = k.transpose(1, 2)
         v = v.transpose(1, 2)
-
 
         # score
         scores = torch.matmul(q, k.transpose(-2,-1)) / math.sqrt(self.dim)
@@ -41,9 +40,8 @@ class MultiHeadAttention(nn.Module):
 
         p_attention = self.dropout(self.attention)
 
-
         x = torch.matmul(p_attention, v) # context vector
-        x = (x.trasnpose(1,2).contiguous().view(n_batch, -1, self.h * self.dim))
+        x = torch.transpose(x,1,2).contiguous().view(n_batch, -1, self.head * self.dim)
 
         return self.linear_output(x)
 
@@ -85,6 +83,7 @@ class StyleEncoder(nn.Module):
 
         return style_embeds
 
+
 class ReferenceEncoder(nn.Module):
     def __init__(self,
                  idim=80,
@@ -108,7 +107,7 @@ class ReferenceEncoder(nn.Module):
                                  stride = conv_stride, padding= padding, bias = False), # use BatchNorm instead of bias
                        nn.BatchNorm2d(conv_out_channels),
                        nn.ReLU(inplace=True)]
-        self.conv = nn.Sequential(*convs)
+        self.convs = nn.Sequential(*convs)
 
         self.conv_layers = conv_layers
         self.kernel_size = conv_kernel_size
@@ -140,28 +139,49 @@ class StyleTokenLayer(nn.Module):
             self,
             ref_embed_dim: int = 128,
             gst_tokens: int = 10,
-            gst_token_dim: int = 256,
+            gst_token_dim: int = 512,
             gst_heads: int = 4,
             dropout_rate: float = 0.0,
     ):
         super(StyleTokenLayer, self).__init__()
+        assert gst_token_dim // gst_heads == ref_embed_dim
 
         gst_embeddings = torch.randn(gst_tokens, gst_token_dim // gst_heads)
         self.register_parameter("gst_embeddings", nn.Parameter(gst_embeddings))
         self.mha = MultiHeadAttention(
-            q_dim = ref_embed_dim,
-            k_dim = gst_token_dim//gst_heads,
-            v_dim = gst_token_dim // gst_heads,
             n_head = gst_heads,
-            n_feat = gst_token_dim,
+            n_feat = gst_token_dim // gst_heads,
             dropout_rate= dropout_rate
         )
 
     def forward(self, ref_embeddings : torch.Tensor) -> torch.Tensor:
         batch_size = ref_embeddings.size(0)
-        gst_embeddings = torch.tanh(self.gst_embeddings).unsqueeze(0).expand(batch_size, -1, -1)
-        ref_embeddings = ref_embeddings.unsqueeze(1)
-        style_embeddings = self.mha(ref_embeddings, gst_embeddings, gst_embeddings, None)
+        gst_embeddings = torch.tanh(self.gst_embeddings).unsqueeze(0).expand(batch_size, -1, -1) # batch, gst_tokens, gst_token_dim//gst_heads
+        ref_embeddings = ref_embeddings.unsqueeze(1)                                             # batch, 1, ref_embed_dim
+
+        style_embeddings = self.mha(ref_embeddings, gst_embeddings, gst_embeddings)
 
         return style_embeddings.squeeze(1)
 
+
+if __name__ == "__main__":
+    from dataloader import *
+
+    MTAT_DIR = '../dataset/MTAT_SMALL/'
+    BATCH_SIZE = 16
+    NUM_MAX_DATA = 50
+
+    train_data_loader = create_data_loader(MTAT_DIR, 'train', NUM_MAX_DATA, BATCH_SIZE)
+    example = next(iter(train_data_loader))
+    print(example[0].shape)
+
+    mel_spec = MelSpectogram()
+    mel_spec_out = mel_spec(example[0])
+    print(mel_spec_out.shape)
+
+    reference_encoder = ReferenceEncoder(idim=911)
+    ref_embed = reference_encoder(mel_spec_out)
+    print(ref_embed.shape)
+
+    style_token = StyleTokenLayer()
+    print(style_token(ref_embed).shape)

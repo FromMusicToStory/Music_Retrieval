@@ -99,9 +99,11 @@ def train(model,optimizer, dataloader):
         tqdm_train.set_description('loss is {:.2f}'.format(loss.item()))
         tqdm_train.update()
         loss = loss
+
+        optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        optimizer.zero_grad()
+
     tqdm_train.close()
 
 

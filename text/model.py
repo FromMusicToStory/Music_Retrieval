@@ -47,6 +47,3 @@ if __name__ == "__main__":
 
     model = TextEncoder()
     print(model(input_ids, mask).shape)
-
-
-

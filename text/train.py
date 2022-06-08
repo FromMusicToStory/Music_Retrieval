@@ -189,7 +189,3 @@ if __name__ == '__main__':
     import os
     os.environ['CUDA_LAUNCH_BLOCKING'] = "0"
     main()
-
-
-
-

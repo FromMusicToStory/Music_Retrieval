@@ -3,6 +3,7 @@ from pathlib import Path
 from collections import defaultdict
 
 import torch
+import torch.nn as nn
 import torchaudio
 import torch.utils.data as data
 
@@ -59,6 +60,23 @@ class OnMemoryDataset(MTATDataset):
         return audio_sample, label
 
 
+class MelSpectogram(nn.Module):
+    def __init__(self,
+                 sr=16000,
+                 n_fft = 1024,
+                 hop_length = 512,
+                 n_mels = 48):
+        super().__init__()
+        self.mel_converter = torchaudio.transforms.MelSpectrogram(sample_rate=sr,
+                                                                  n_fft=n_fft,
+                                                                  hop_length=hop_length,
+                                                                  n_mels=n_mels)
+    def forward(self, input):
+        mel_spec = self.mel_converter(input)
+
+        return mel_spec
+
+
 def create_data_loader(MTAT_DIR, split, num_max_data, batch_size):
     dataset = OnMemoryDataset(
         MTAT_DIR,
@@ -88,3 +106,6 @@ if __name__ == "__main__":
 
     example = next(iter(train_data_loader))
     print(example[0].shape, example[1].shape)
+
+    mel_spec = MelSpectogram()
+    print(mel_spec(example[0]).shape)

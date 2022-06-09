@@ -3,19 +3,20 @@ import torch.nn as nn
 import numpy
 import math
 from typing import Sequence
+from torchaudio.transforms import MelSpectrogram
 
 # reference encoder from GST
 
 class MultiHeadAttention(nn.Module):
-    def __init__(self, n_head, n_feat, dropout_rate):
+    def __init__(self, q_dim, k_dim, v_dim, n_head, n_feat, dropout_rate):
         super(MultiHeadAttention, self).__init__()
         assert n_feat % n_head ==0
 
         self.dim = n_feat//n_head # dim of q, k, v, they have to be same
         self.head = n_head
-        self.linear_q = nn.Linear(n_feat, n_feat)
-        self.linear_k = nn.Linear(n_feat, n_feat)
-        self.linear_v = nn.Linear(n_feat, 1)
+        self.linear_q = nn.Linear(q_dim, n_feat)
+        self.linear_k = nn.Linear(k_dim, n_feat)
+        self.linear_v = nn.Linear(v_dim, n_feat)
         self.linear_output = nn.Linear(n_feat, n_feat)
         self.attention = None
         self.dropout = nn.Dropout(p = dropout_rate)
@@ -25,8 +26,8 @@ class MultiHeadAttention(nn.Module):
         # first, transform q, k v
         n_batch = q.size(0)
         q = self.linear_q(q).view(n_batch , -1, self.head , self.dim)
-        k = self.linear_q(k).view(n_batch, -1, self.head, self.dim)
-        v = self.linear_q(v).view(n_batch, -1, self.head, self.dim)
+        k = self.linear_k(k).view(n_batch, -1, self.head, self.dim)
+        v = self.linear_v(v).view(n_batch, -1, self.head, self.dim)
 
         q = q.transpose(1, 2) # now, (batch, head, time, dim)
         k = k.transpose(1, 2)
@@ -86,7 +87,7 @@ class StyleEncoder(nn.Module):
 
 class ReferenceEncoder(nn.Module):
     def __init__(self,
-                 idim=80,
+                 idim=80, # dimension of mel-spectrogram
                  conv_layers: int = 6,
                  conv_channels_list: Sequence[int] = (32, 32, 64, 64, 128, 128),
                  conv_kernel_size: int = 3,
@@ -144,14 +145,17 @@ class StyleTokenLayer(nn.Module):
             dropout_rate: float = 0.0,
     ):
         super(StyleTokenLayer, self).__init__()
-        assert gst_token_dim // gst_heads == ref_embed_dim
+        # assert gst_token_dim // gst_heads == ref_embed_dim
 
         gst_embeddings = torch.randn(gst_tokens, gst_token_dim // gst_heads)
         self.register_parameter("gst_embeddings", nn.Parameter(gst_embeddings))
         self.mha = MultiHeadAttention(
-            n_head = gst_heads,
-            n_feat = gst_token_dim // gst_heads,
-            dropout_rate= dropout_rate
+            q_dim=ref_embed_dim,
+            k_dim=gst_token_dim // gst_heads,
+            v_dim=gst_token_dim // gst_heads,
+            n_head=gst_heads,
+            n_feat=gst_token_dim,
+            dropout_rate=dropout_rate
         )
 
     def forward(self, ref_embeddings : torch.Tensor) -> torch.Tensor:
@@ -175,7 +179,7 @@ if __name__ == "__main__":
     example = next(iter(train_data_loader))
     print(example[0].shape)
 
-    mel_spec = MelSpectogram()
+    mel_spec = MelSpectrogram()
     mel_spec_out = mel_spec(example[0])
     print(mel_spec_out.shape)
 

@@ -798,7 +798,7 @@
    "token_count":77,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"disgusting,annoying"
     }
    ]
@@ -821,7 +821,7 @@
    "token_count":50,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"irritating,furious"
     }
    ]
@@ -844,7 +844,7 @@
    "token_count":75,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious,disgusting"
     }
    ]
@@ -867,7 +867,7 @@
    "token_count":65,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious,irritating"
     }
    ]
@@ -890,7 +890,7 @@
    "token_count":57,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -913,7 +913,7 @@
    "token_count":73,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -936,7 +936,7 @@
    "token_count":54,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious,grumbling"
     }
    ]
@@ -959,7 +959,7 @@
    "token_count":66,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"annoying,grumbling"
     }
    ]
@@ -982,7 +982,7 @@
    "token_count":70,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"annoying,irritating"
     }
    ]
@@ -1005,7 +1005,7 @@
    "token_count":70,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"annoying,furious"
     }
    ]
@@ -2661,7 +2661,7 @@
    "token_count":64,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -2684,7 +2684,7 @@
    "token_count":31,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -2707,7 +2707,7 @@
    "token_count":71,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"defensive"
     }
    ]
@@ -2730,7 +2730,7 @@
    "token_count":87,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -2753,7 +2753,7 @@
    "token_count":59,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -2776,7 +2776,7 @@
    "token_count":59,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -2799,7 +2799,7 @@
    "token_count":65,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -2822,7 +2822,7 @@
    "token_count":61,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious,grumbling"
     }
    ]
@@ -2845,7 +2845,7 @@
    "token_count":76,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"frustrating"
     }
    ]
@@ -3282,7 +3282,7 @@
    "token_count":70,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"malicious"
     }
    ]
@@ -3305,7 +3305,7 @@
    "token_count":62,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"malicious,irritating"
     }
    ]
@@ -3328,7 +3328,7 @@
    "token_count":65,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"fretting,defensive"
     }
    ]
@@ -3351,7 +3351,7 @@
    "token_count":73,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"malicious,defensive"
     }
    ]
@@ -3374,7 +3374,7 @@
    "token_count":71,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious,irritating"
     }
    ]
@@ -3397,7 +3397,7 @@
    "token_count":61,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious,irritating"
     }
    ]
@@ -3420,7 +3420,7 @@
    "token_count":76,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"disgusting,furious"
     }
    ]
@@ -3443,7 +3443,7 @@
    "token_count":76,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious,irritating"
     }
    ]
@@ -3466,7 +3466,7 @@
    "token_count":57,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"defensive,irritating"
     }
    ]
@@ -5076,7 +5076,7 @@
    "token_count":85,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -5099,7 +5099,7 @@
    "token_count":60,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"annoying"
     }
    ]
@@ -5122,7 +5122,7 @@
    "token_count":60,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -5145,7 +5145,7 @@
    "token_count":34,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"annoying"
     }
    ]
@@ -5168,7 +5168,7 @@
    "token_count":24,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"malicious"
     }
    ]
@@ -5191,7 +5191,7 @@
    "token_count":38,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"irritating"
     }
    ]
@@ -5214,7 +5214,7 @@
    "token_count":59,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -5237,7 +5237,7 @@
    "token_count":77,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -5260,7 +5260,7 @@
    "token_count":29,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"disgusting"
     }
    ]
@@ -5283,7 +5283,7 @@
    "token_count":70,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"malicious,disgusting"
     }
    ]
@@ -6295,7 +6295,7 @@
    "token_count":65,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"irritating"
     }
    ]
@@ -6318,7 +6318,7 @@
    "token_count":65,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"grumbling,fretting"
     }
    ]
@@ -6341,7 +6341,7 @@
    "token_count":64,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"annoying,grumbling"
     }
    ]
@@ -6364,7 +6364,7 @@
    "token_count":54,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious,grumbling"
     }
    ]
@@ -6387,7 +6387,7 @@
    "token_count":66,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -6410,7 +6410,7 @@
    "token_count":70,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"irritating,furious"
     }
    ]
@@ -6433,7 +6433,7 @@
    "token_count":47,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious"
     }
    ]
@@ -6456,7 +6456,7 @@
    "token_count":81,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"furious,frustrating"
     }
    ]
@@ -6479,7 +6479,7 @@
    "token_count":62,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"grumbling,fretting"
     }
    ]
@@ -7307,7 +7307,7 @@
    "token_count":56,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"disgusting,irritating"
     }
    ]
@@ -7330,7 +7330,7 @@
    "token_count":67,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"disgusting,furious"
     }
    ]
@@ -7353,7 +7353,7 @@
    "token_count":72,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"grumbling,irritating"
     }
    ]
@@ -7376,7 +7376,7 @@
    "token_count":53,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"grumbling,annoying"
     }
    ]
@@ -7399,7 +7399,7 @@
    "token_count":61,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"disgusting,furious"
     }
    ]
@@ -7422,7 +7422,7 @@
    "token_count":61,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"defensive"
     }
    ]
@@ -7445,7 +7445,7 @@
    "token_count":60,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"annoying,irritating"
     }
    ]
@@ -7468,7 +7468,7 @@
    "token_count":68,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"defensive"
     }
    ]
@@ -7491,7 +7491,7 @@
    "token_count":68,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"irritating"
     }
    ]
@@ -7514,7 +7514,7 @@
    "token_count":50,
    "styles":[
     {
-     "emotion":"angery",
+     "emotion":"angry",
      "style":"grumbling,irritating"
     }
    ]

@@ -41,13 +41,13 @@ if __name__ == "__main__":
     example = next(iter(train_data_loader))
     print(example[0].shape)
 
-    mel_spec = MelSpectogram()
+    mel_spec = MelSpectrogram()
     mel_spec_out = mel_spec(example[0])
     print(mel_spec_out.shape)
 
-    reference_encoder = ReferenceEncoder(idim=911)
+    reference_encoder = ReferenceEncoder(idim=911, gru_units=1024)
     ref_embed = reference_encoder(mel_spec_out)
     print(ref_embed.shape)
 
-    style_token = VAE_StyleTokenLayer()
+    style_token = VAE_StyleTokenLayer(gru_units=1024)
     print(style_token(ref_embed)[0].shape)

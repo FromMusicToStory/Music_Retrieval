@@ -60,7 +60,7 @@ class OnMemoryDataset(MTATDataset):
         return audio_sample, label
 
 
-class MelSpectogram(nn.Module):
+class MelSpectrogram(nn.Module):
     def __init__(self,
                  sr=16000,
                  n_fft = 1024,
@@ -107,5 +107,5 @@ if __name__ == "__main__":
     example = next(iter(train_data_loader))
     print(example[0].shape, example[1].shape)
 
-    mel_spec = MelSpectogram()
+    mel_spec = MelSpectrogram()
     print(mel_spec(example[0]).shape)

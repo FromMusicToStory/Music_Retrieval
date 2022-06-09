@@ -11,20 +11,20 @@ class TextClassification_Dataset(data.Dataset):
         self.max_len = max_len
 
         if split == 'train':
-            self.data = json.load(open(self.dir + "tta-train-v0.1.4.json", 'r'))
+            self.data = json.load(open(self.dir + "train_filtered_story_eng_label.json", 'r'))
         elif split == 'valid':
-            self.data = json.load(open(self.dir + "tta-valid-v0.1.4.json", 'r'))
+            self.data = json.load(open(self.dir + "valid_filtered_story_eng_label.json", 'r'))
         else:
-            self.data = json.load(open(self.dir + "tta-test-v0.1.4.json", 'r'))
+            self.data = json.load(open(self.dir + "test_filtered_story_eng_label.json", 'r'))
 
         self.emotion_map = {
-            '기쁨': 0,
-            '당황': 1,
-            '무감정': 2,
-            '분노': 3,
-            '불안': 4,
-            '상처': 5,
-            '슬픔': 6
+            'happy': 0,
+            'flustered': 1,
+            'neutral': 2,
+            'angry': 3,
+            'anxious': 4,
+            'hurt': 5,
+            'sad': 6
         }
 
     def __len__(self):
@@ -43,6 +43,7 @@ class TextClassification_Dataset(data.Dataset):
             return_tensors='pt')
 
         return {
+            'text': text,
             'input_ids': tokenized['input_ids'].flatten(),
             'mask': tokenized['attention_mask'].flatten(),
             'targets': torch.tensor(self.emotion_map[emotion], dtype=torch.long)

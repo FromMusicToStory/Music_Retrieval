@@ -3,7 +3,6 @@ import torch.nn as nn
 import numpy
 import math
 from typing import Sequence
-from torchaudio.transforms import MelSpectrogram
 
 # reference encoder from GST
 
@@ -87,7 +86,7 @@ class StyleEncoder(nn.Module):
 
 class ReferenceEncoder(nn.Module):
     def __init__(self,
-                 idim=80, # dimension of mel-spectrogram
+                 idim = 80, # dimension of mel-spectrogram
                  conv_layers: int = 6,
                  conv_channels_list: Sequence[int] = (32, 32, 64, 64, 128, 128),
                  conv_kernel_size: int = 3,

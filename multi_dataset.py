@@ -86,7 +86,6 @@ class AudioTextDataset(Dataset):
         elif len(mono) < self.sr * self.audio_max:
             mono = torch.concat([mono, torch.zeros(self.sr * self.audio_max - len(mono))])
         mel = self.mel_converter(mono)
-        mel = mel.unsqueeze(0)
         mel_file = os.path.join(self.audio_dir, audio_path.replace("mp3","pt"))
         torch.save(mel,mel_file)
         return mel

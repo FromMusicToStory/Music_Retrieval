@@ -1,4 +1,5 @@
 import pandas as pd
+import csv
 from pathlib import Path
 from collections import defaultdict
 
@@ -60,6 +61,75 @@ class OnMemoryDataset(MTATDataset):
         return audio_sample, label
 
 
+class JamendoDataset(data.Dataset):
+    def __init__(self, dir_path, split='train', sr=16000, audio_max=500):
+        self.dir = dir_path
+        self.sr = sr
+        self.audio_max = audio_max
+
+        if split == "train":
+            self.labels = self.read_jamendo(self.dir + 'autotagging_moodtheme-train.tsv')
+        elif split == 'valid':
+            self.labels = self.read_jamendo(self.dir + 'autotagging_moodtheme-validation.tsv')
+        elif split == "test":
+            self.labels = self.read_jamendo(self.dir + 'autotagging_moodtheme-test.tsv')
+        else:
+            train = self.read_jamendo(self.dir + "autotagging_moodtheme-train.tsv")
+            valid = self.read_jamendo(self.dir + "autotagging_moodtheme-validation.tsv")
+            test = self.read_jamendo(self.dir + "autotagging_moodtheme-test.tsv")
+            self.labels = pd.concat([train, valid, test])
+
+    def __len__(self):
+        return len(self.labels)
+
+    def read_jamendo(self, path):
+        data = open(path).readlines()
+        track_id =[]
+        paths=[]
+        tags = []
+
+        for i in range(1, len(data)):
+            line = data[i][:-1].split("\t")
+
+            tag = line[5:]
+            tag = [t.split('---')[-1] for t in tag]
+
+            track_id.append(line[0])
+            paths.append(line[3])
+            tags.append(tag)
+
+        df = pd.DataFrame({'TRACK_ID' : track_id,
+                           'PATH' : paths,
+                           'TAGS' : tags})
+        return df
+
+    def load_audio(self):
+        total_audio_datas = []
+
+        for audio_path in self.labels['PATH']:
+            audio_sample, sr = torchaudio.load(self.dir + audio_path, num_frames=self.sr * self.audio_max)
+
+            if len(audio_sample) > 1:
+                audio_sample = audio_sample.mean(dim=0)
+
+            if sr != self.sr:
+                audio_sample = torchaudio.functional.resample(audio_sample, orig_freq=sr, new_freq=self.sr)
+
+            total_audio_datas.append(audio_sample)
+
+        return total_audio_datas
+
+    def __getitem__(self, idx):
+        total_audio_datas = self.load_audio()
+
+        audio_sample = total_audio_datas[idx]
+        label = self.labels['TAGS'][idx]
+
+        return {"audio" : audio_sample,
+                "label" : label
+        }
+
+
 class MelSpectrogram(nn.Module):
     def __init__(self,
                  sr=16000,
@@ -77,12 +147,20 @@ class MelSpectrogram(nn.Module):
         return mel_spec
 
 
-def create_data_loader(MTAT_DIR, split, num_max_data, batch_size):
-    dataset = OnMemoryDataset(
-        MTAT_DIR,
-        split=split,
-        num_max_data=num_max_data
-    )
+def create_audio_data_loader(DATA_DIR, split, num_max_data, batch_size):
+    if 'MTAT' in DATA_DIR:
+        dataset = OnMemoryDataset(
+            DATA_DIR,
+            split=split,
+            num_max_data=num_max_data
+        )
+
+    else:
+        dataset = JamendoDataset(
+            DATA_DIR,
+            split=split,
+            num_max_data=num_max_data
+        )
 
     return data.DataLoader(
         dataset,
@@ -93,19 +171,24 @@ def create_data_loader(MTAT_DIR, split, num_max_data, batch_size):
 
 if __name__ == "__main__":
     MTAT_DIR = '../dataset/MTAT_SMALL/'
-    BATCH_SIZE = 16
-    NUM_MAX_DATA = 50
+    JAMENDO_DIR = '../dataset/mtg-jamendo-dataset/'
+    BATCH_SIZE = 8
+    NUM_MAX_DATA = 16
+    AUDIO_MAX = 500
 
-    example = OnMemoryDataset(MTAT_DIR, split='train', num_max_data=50)
-    audio, label = example[10]
-    print(audio.shape)
-    print(label.shape)
+    example = JamendoDataset(JAMENDO_DIR, 'train', AUDIO_MAX)
+    print(example[4]['audio'].shape)
+    print(example[4]['label'])
+
+    '''
+    example = OnMemoryDataset(MTAT_DIR, split='train', num_max_data=NUM_MAX_DATA)
+    audio, label = example[4]
     print(example.vocab[torch.where(label)])
 
-    train_data_loader = create_data_loader(MTAT_DIR, 'train', NUM_MAX_DATA, BATCH_SIZE)
-
+    train_data_loader = create_audio_data_loader(MTAT_DIR, 'train', NUM_MAX_DATA, BATCH_SIZE)
     example = next(iter(train_data_loader))
     print(example[0].shape, example[1].shape)
 
     mel_spec = MelSpectrogram()
     print(mel_spec(example[0]).shape)
+    '''

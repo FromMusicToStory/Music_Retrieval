@@ -78,5 +78,6 @@ def make_label():
     return label
 
 
-label = make_label()
-print(label.keys())
+if __name__ == "__main__":
+    label = make_label()
+    print(label.keys())

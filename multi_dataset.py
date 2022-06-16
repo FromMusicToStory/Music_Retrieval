@@ -217,10 +217,10 @@ class AudioTextDataset(Dataset):
         return selected
 
 if __name__ == '__main__':
-    audio_dir = 'dataset/MTG/'
+    audio_dir = 'dataset/mtg-jamendo-dataset/'
     text_dir = 'dataset/Story_dataset/'
 
-    dataset = AudioTextDataLoader(audio_dir =audio_dir, text_dir=text_dir)
+    dataset = AudioTextDataset(audio_dir =audio_dir, text_dir=text_dir)
     batch = dataset[0]
 
     # data_loader = DataLoader(dataset, num_workers=4, batch_size=64)
@@ -230,5 +230,4 @@ if __name__ == '__main__':
     # print(batch['text_label'].shape)
     # print(batch['mel'].shape)
     # print(batch['text'].shape)
-
 

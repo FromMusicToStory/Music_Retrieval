@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from reference_encoder_gst import ReferenceEncoder
+from audio.reference_encoder_gst import ReferenceEncoder
 
 # reference encoder from tacotron2-vae
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     BATCH_SIZE = 16
     NUM_MAX_DATA = 50
 
-    train_data_loader = create_data_loader(MTAT_DIR, 'train', NUM_MAX_DATA, BATCH_SIZE)
+    train_data_loader = create_audio_data_loader(MTAT_DIR, 'train', NUM_MAX_DATA, BATCH_SIZE)
     example = next(iter(train_data_loader))
     print(example[0].shape)
 

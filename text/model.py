@@ -39,7 +39,7 @@ if __name__ == "__main__":
     TEXT_DIR = '../dataset/Story_dataset/'
     BATCH_SIZE = 16
     MAX_LEN = 512
-    train_data_loader = create_data_loader(TEXT_DIR, 'train', MAX_LEN, BATCH_SIZE)
+    train_data_loader = create_text_data_loader(TEXT_DIR, 'train', MAX_LEN, BATCH_SIZE)
 
     example = next(iter(train_data_loader))
     input_ids = example['input_ids']

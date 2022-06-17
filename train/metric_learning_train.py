@@ -4,6 +4,8 @@ from tqdm import tqdm
 from fusion.metric_learning import *
 from config import *
 
+from tensorboardX import SummaryWriter
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description='get arguments')
@@ -39,14 +41,21 @@ def parse_args():
         default=metric_embedding_train_config['weight_decay'],
         type=float,
         required=False,
-        help='learning rate'
+        help='weight_decay'
     )
 
     parser.add_argument(
         '--cuda',
         default='cuda:0',
-        help='class weight'
+        help='cuda'
     )
+
+    parser.add_argument(
+        '--log_dir',
+        default=metric_embedding_train_config['log_dir'],
+        help='log_dir to save'
+    )
+
     args = parser.parse_args()
     return args
 
@@ -54,6 +63,10 @@ args = parse_args()
 
 
 def main():
+    if not os.path.exists(args.log_dir):
+        os.makedirs(args.log_dir)
+    logger = SummaryWriter(log_dir=args.log_dir)
+
     AUDIO_DIR = metric_embedding_train_config['audio_dir']
     TEXT_DIR = metric_embedding_train_config['text_dir']
     MAX_LEN = metric_embedding_train_config['max_len']
@@ -61,8 +74,10 @@ def main():
     BATCH_SIZE = args.batch
 
     if args.train == True:
-        train_dataloader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'train', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
-        valid_dataloader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
+        train_dataloader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
+        valid_dataloader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'test', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
+
+        print('data loading done')
 
         seed = 1024
         torch.manual_seed(seed)
@@ -79,25 +94,31 @@ def main():
         optimizer = torch.optim.AdamW(params=model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
         for epoch in range(args.epochs):
-            train(model, optimizer, train_dataloader)
-            loss, triplet_loss, triplet_distance_loss, cosine_similarity, manhattan_distance, euclidean_distance  = evaluate(model,valid_dataloader)
+            train(model, optimizer, train_dataloader, logger, epoch)
+            loss, triplet_loss, triplet_distance_loss, cosine_similarity, manhattan_distance, euclidean_distance  = evaluate(model,valid_dataloader, logger, epoch)
 
             if min_loss > loss:
                 temp = min_loss
                 min_loss = loss
                 if 'result' not in os.listdir():
                     os.mkdir('result')
-                    torch.save(model,'./result/{}_epoch{}.pt'.format('metric_with_embed',epoch))
+                    torch.save(model,'../result/{}_epoch{}.pt'.format('metric_with_embed', epoch))
                     print("-"*10,"Saving Model - loss {:.4f} ->  {:.4f}".format(temp, min_loss),"-"*10)
 
+    logger.flush()
 
-def train(model, optimizer, dataloader):
+
+def train(model, optimizer, dataloader, logger, epoch):
     print("Train start")
     model.train()
     tqdm_train = tqdm(total=len(dataloader), position=1)
 
-    for batch in dataloader:
+    loss_per_epoch = []
+    for idx, batch in enumerate(dataloader):
         _, _, _, loss = model(batch)
+        logger.add_scalar('train_loss', loss, idx)
+        loss_per_epoch.append(loss)
+
         tqdm_train.set_description('loss is {:.2f}'.format(loss.item()))
         tqdm_train.update()
 
@@ -106,11 +127,13 @@ def train(model, optimizer, dataloader):
         optimizer.step()
 
     tqdm_train.close()
+    logger.add_scalar('train_loss_per_epoch', sum(loss_per_epoch) / len(loss_per_epoch), epoch)
 
 
-def evaluate(model,valid_dataloader):
+def evaluate(model,valid_dataloader, logger, epoch):
     print("Eval start")
     model.eval()
+    tqdm_valid = tqdm(total=len(valid_dataloader), position=1)
 
     with torch.no_grad():
         losses = 0
@@ -121,8 +144,7 @@ def evaluate(model,valid_dataloader):
         euclidean_distances = 0
 
         for batch in valid_dataloader:
-
-            score = model.evaulate(batch)
+            score = model.evaluate(batch)
 
             loss = score['loss'].item()
             losses += loss
@@ -149,6 +171,14 @@ def evaluate(model,valid_dataloader):
         manhattan_distances = manhattan_distances / len(valid_dataloader)
         euclidean_distances = euclidean_distances / len(valid_dataloader)
 
+        logger.add_scalar('valid/loss_per_epoch', losses, epoch)
+        logger.add_scalar("valid/triplet_loss_per_epoch", triplet_losses, epoch)
+        logger.add_scalar("valid/triplet_distance_loss_per_epoch", triplet_distance_losses, epoch)
+        logger.add_scalar("valid/cosine_similarity_per_epoch", cosine_similarities, epoch)
+        logger.add_scalar("valid/manhattan_distance_per_epoch", manhattan_distances, epoch)
+        logger.add_scalar("valid/euclidean_distance_per_epoch", euclidean_distances, epoch)
+
+        tqdm_valid.close()
 
         print('Validation Result: Loss - {:.4f} | triplet_loss - {:.3f} |\
               triplet_distance_loss - {:.3f} | cosine_similarity = {:.3f} | manhattan_distance - {:.3f} | \

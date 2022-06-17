@@ -216,6 +216,9 @@ if __name__ == "__main__":
     print(example[4]['audio'].shape)
     print(example[4]['label'])
 
+    mel_spec = MelSpectrogram()
+    print(mel_spec(example[4]['audio']).shape)
+
     '''
     example = OnMemoryDataset(MTAT_DIR, split='train', num_max_data=NUM_MAX_DATA)
     audio, label = example[4]

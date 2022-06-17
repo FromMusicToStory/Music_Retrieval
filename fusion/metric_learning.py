@@ -8,15 +8,15 @@ from metric_embedding_dataloader import *
 
 class MLEmbedModel(nn.Module):
     def __init__(self, ndim, reference_style = 'gst', margin =0.2):
-        super(self).__init__()
-        self.n_dim  = ndim
+        super().__init__()
+        self.ndim  = ndim
         self.text_encoder = TextEncoder(output_dim=self.ndim)
 
         if reference_style == 'gst':
-            self.reference_encoder = ReferenceEncoder(idim=6648)
+            self.reference_encoder = ReferenceEncoder(idim=6)
             self.audio_encoder = StyleTokenLayer()
         else:
-            self.reference_encoder = ReferenceEncoder(idim=6648, gru_units=self.ndim*2)
+            self.reference_encoder = ReferenceEncoder(idim=6, gru_units=self.ndim*2)
             self.audio_encoder = VAE_StyleTokenLayer(gru_units=self.ndim*2)
 
         self.relu = nn.ReLU()
@@ -24,7 +24,7 @@ class MLEmbedModel(nn.Module):
 
 
     def audio_to_embedding(self, batch):
-        ref_embed = self.reference_encoder(batch)
+        ref_embed = self.reference_encoder(batch['anchor'])
         style_token = self.audio_encoder(ref_embed)
 
         return style_token
@@ -56,10 +56,10 @@ if __name__ == "__main__":
     MAX_LEN = 512
     AUDIO_MAX = 500
 
-    test =  AudioTextDataset(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX)
+    # test =  AudioTextDataset(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX)
     data_loader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
 
     example = next(iter(data_loader))
 
     model = MLEmbedModel(ndim=MAX_LEN)
-    print(model)
+    print(model(example))

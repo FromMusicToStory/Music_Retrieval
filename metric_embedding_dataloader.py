@@ -106,7 +106,7 @@ if __name__ == "__main__":
     MAX_LEN = 512
     AUDIO_MAX = 500
 
-    test =  AudioTextDataset(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX)
+    test =  AudioTextDataset(AUDIO_DIR , TEXT_DIR, 'test', MAX_LEN, AUDIO_MAX)
     print(test[0]['anchor'].shape)
     print(test[0]['pos_input_ids'].shape)
     print(test[0]['neg_input_ids'].shape)
@@ -114,3 +114,5 @@ if __name__ == "__main__":
     data_loader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
     example = next(iter(data_loader))
     print(example['anchor'].shape)
+    print(example['pos_input_ids'].shape)
+    print(example['neg_input_ids'].shape)

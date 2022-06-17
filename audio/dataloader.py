@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import csv
 from pathlib import Path
@@ -79,6 +80,8 @@ class JamendoDataset(data.Dataset):
             test = self.read_jamendo(self.dir + "autotagging_moodtheme-test.tsv")
             self.labels = pd.concat([train, valid, test])
 
+        self.pre_preprocess_and_save_data()
+
     def __len__(self):
         return len(self.labels)
 
@@ -103,7 +106,35 @@ class JamendoDataset(data.Dataset):
                            'TAGS' : tags})
         return df
 
+    def pre_preprocess_and_save_data(self):
+
+        print("audio sample Saving & Load")
+
+        for i in range(len(self.labels['PATH'])):
+            data = defaultdict(list)
+
+            x = self.labels['PATH'].values[i]
+
+            if os.path.exists(self.dir + x.split('.')[0] + '.pt') == True:
+                pass
+            else:
+                audio_sample, sr = torchaudio.load(self.dir + x, num_frames=self.sr * self.audio_max)
+
+                if len(audio_sample) > 1:
+                    audio_sample = audio_sample.mean(dim=0)
+
+                if sr != self.sr:
+                    audio_sample = torchaudio.functional.resample(audio_sample, orig_freq=sr, new_freq=self.sr)
+
+                data['audio'].append(audio_sample)
+                data['label'].append(self.labels['TAGS'][i])
+
+                torch.save(data, self.dir + x.split('.')[0] + '.pt')
+
+        print("Saving complete!")
+
     def load_audio(self):
+
         total_audio_datas = []
 
         for audio_path in self.labels['PATH']:
@@ -120,13 +151,18 @@ class JamendoDataset(data.Dataset):
         return total_audio_datas
 
     def __getitem__(self, idx):
+        '''
         total_audio_datas = self.load_audio()
 
         audio_sample = total_audio_datas[idx]
         label = self.labels['TAGS'][idx]
+        '''
 
-        return {"audio" : audio_sample,
-                "label" : label
+        audio_path = self.dir + self.labels['PATH'].iloc[idx].split('.')[0] + '.pt'
+        audio_sample, label = torch.load(audio_path).values()
+
+        return {"audio" : audio_sample[0],
+                "label" : label[0]
         }
 
 

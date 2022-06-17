@@ -13,7 +13,7 @@ from sklearn.metrics.pairwise import *
 from word2vec import W2V
 
 import argparse
-import tqdm
+from tqdm import tqdm
 
 from tensorboardX import SummaryWriter
 
@@ -148,9 +148,9 @@ def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     # load data
-    train_dataset = AudioTextDataset(audio_dir=args.audio_dir, text_dir=args.text_dir, split='valid', device=device)
+    train_dataset = AudioTextDataset(audio_dir=args.audio_dir, text_dir=args.text_dir, split='train', device=device)
     train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size)
-    valid_dataset = AudioTextDataset(audio_dir=args.audio_dir, text_dir=args.text_dir, split='test', device=device)
+    valid_dataset = AudioTextDataset(audio_dir=args.audio_dir, text_dir=args.text_dir, split='valid', device=device)
     valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size)
 
     print('data loading done')
@@ -179,7 +179,7 @@ def main():
         print(f'{start_epoch}-th model loaded')
 
     for epoch in range(start_epoch, args.epoch):
-        # train(model, train_dataloader,optimizer,logger, epoch)
+        train(model, train_dataloader,optimizer,logger, epoch)
         val_loss, triplet_losses, triplet_distance_losses, \
         cosine_similarities, manhattan_distances, euclidean_distances = validate(model, valid_dataloader, logger, epoch)
 
@@ -197,7 +197,7 @@ def main():
 def train(model, dataloader, optimizer, logger, epoch):  # for one epoch
     print("Train start")
     model.train()
-    tqdm_train = tqdm.tqdm(total=len(dataloader), position=1)
+    tqdm_train = tqdm(total=len(dataloader), position=1)
 
     loss_per_epoch = []
     for idx, batch in enumerate(dataloader):
@@ -228,7 +228,7 @@ def validate(model, valid_dataloader, logger, epoch):
         manhattan_distances = 0
         euclidean_distances = 0
 
-        for idx, batch in enumerate(valid_dataloader):
+        for idx, batch in tqdm(enumerate(valid_dataloader)):
             score = model.evaluate(batch)
 
             loss = score['loss'].item()

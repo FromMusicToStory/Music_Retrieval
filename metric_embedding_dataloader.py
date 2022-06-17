@@ -45,7 +45,7 @@ class AudioTextDataset(data.Dataset):
 
 
     def get_random_text(self, tag, select='positive'):
-        random_number = random.randint(0, len(self.text_dataset))
+        random_number = random.randint(0, len(self.text_dataset)-1)
         tag_num  = self.get_text_tag_from_audio(tag, select=select)
 
         if self.text_dataset[random_number]['target'] == tag_num:
@@ -53,7 +53,7 @@ class AudioTextDataset(data.Dataset):
 
         else:
             while self.text_dataset[random_number]['target'] != tag_num:
-                random_number = random.randint(0, len(self.text_dataset))
+                random_number = random.randint(0, len(self.text_dataset)-1)
                 return self.text_dataset[random_number]
 
     def __len__(self):

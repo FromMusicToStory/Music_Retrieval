@@ -94,7 +94,7 @@ def main():
         optimizer = torch.optim.AdamW(params=model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
         for epoch in range(args.epochs):
-            # train(model, optimizer, train_dataloader, logger, epoch)
+            train(model, optimizer, train_dataloader, logger, epoch)
             loss, triplet_loss, triplet_distance_loss, cosine_similarity, manhattan_distance, euclidean_distance  = evaluate(model,valid_dataloader, logger, epoch)
 
             if min_loss > loss:

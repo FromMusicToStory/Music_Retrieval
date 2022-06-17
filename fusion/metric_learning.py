@@ -86,7 +86,7 @@ class MLEmbedModel(nn.Module):
 
         score = {
             "loss": losses.mean(),
-            "trplet_loss": triplet_loss.mean(),
+            "triplet_loss": triplet_loss.mean(),
             "triplet_distance_loss": triplet_distance_loss.mean(),
             "cosine_similarity": cosine_similarity.mean(),
             "manhattan_distance": manhattan_distances.mean(),

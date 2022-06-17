@@ -5,7 +5,7 @@ import random
 
 
 class AudioTextDataset(data.Dataset):
-    def __init__(self, audio_dir, text_dir, split, max_len, audio_max):
+    def __init__(self, audio_dir, text_dir, split, max_len, audio_max, filter_audio_save = True):
         self.audio_dir = audio_dir
         self.text_dir = text_dir
         self.split = split
@@ -15,6 +15,11 @@ class AudioTextDataset(data.Dataset):
         self.audio_dataset = JamendoDataset(self.audio_dir, self.split, self.audio_max)
         self.text_dataset = StoryTextDataset(self.text_dir, 'none', self.max_len)
         self.mel_spec = MelSpectrogram()
+
+        if filter_audio_save == True:
+            self.filter_audio_save_mel()
+
+        self.total_audio, self.total_tags, self.len = self.load_mel()
 
 
     def get_text_tag_from_audio(self, tag, select='positive'):
@@ -56,28 +61,52 @@ class AudioTextDataset(data.Dataset):
                 random_number = random.randint(0, len(self.text_dataset)-1)
                 return self.text_dataset[random_number]
 
+
+    def filter_audio_save_mel(self):
+        for i in range(len(self.audio_dataset)):
+            data = defaultdict(list)
+
+            audio = self.audio_dataset[i]['audio']
+            audio_tag = self.audio_dataset[i]['label']
+            path = self.audio_dataset.labels['PATH'].values[i]
+
+            if len(audio_tag) > 1:
+                result = []
+                for tag in audio_tag:
+                    result.append(self.get_text_tag_from_audio(tag, select='positive'))
+                    if len(set(result)) == 1 or 2 in set(result):
+                        audio_tag = audio_tag[0]
+                    else:
+                        pass
+
+            data['audio'].append(self.mel_spec(audio))
+            data['tag'].append(audio_tag)
+
+            torch.save(data, self.audio_dir + path.split('.')[0] + '_mel.pt')
+
+
+    def load_mel(self):
+        total_audio = []
+        total_tags = []
+
+        for audio_path in self.audio_dataset.labels['PATH']:
+            if os.path.exists(self.audio_dir + audio_path.split('.')[0] + '_mel.pt') == True:
+                audio, audio_tag = torch.load(self.audio_dir + audio_path.split('.')[0] + '_mel.pt').values()
+                total_audio.append(audio)
+                total_tags.append(audio_tag)
+
+        return total_audio, total_tags, len(total_audio)
+
     def __len__(self):
-        return len(self.audio_dataset)
+        return self.len
 
     def __getitem__(self, idx):
-        audio = self.audio_dataset[idx]
-        audio_tag = audio['label']
-
-        if len(audio_tag) > 1:
-            for i in range(len(audio_tag)):
-                result = []
-                result.append(self.get_text_tag_from_audio(audio_tag[i], select='positive'))
-                if len(set(result)) != 1:
-                    audio_tag = audio_tag[0]
-                else:
-                    return
-
-        pos_text = self.get_random_text(audio_tag, select='positive')
-        neg_text = self.get_random_text(audio_tag, select='negative')
-
+        anchor =  self.total_audio[idx][0]
+        pos_text = self.get_random_text(self.total_tags[idx], select='positive')
+        neg_text = self.get_random_text(self.total_tags[idx], select='negative')
 
         return {
-            "anchor" : self.mel_spec(audio['audio']),
+            "anchor" : anchor,
             "pos_input_ids": pos_text['input_ids'],
             "pos_mask" : pos_text['mask'],
             "neg_input_ids": neg_text['input_ids'],
@@ -90,7 +119,8 @@ def create_data_loader(AUDIO_DIR , TEXT_DIR, split, max_len, audio_max, batch_si
         AUDIO_DIR, TEXT_DIR,
         split=split,
         max_len=max_len,
-        audio_max = audio_max
+        audio_max = audio_max,
+        filter_audio_save = False
     )
 
     return data.DataLoader(
@@ -106,10 +136,10 @@ if __name__ == "__main__":
     MAX_LEN = 512
     AUDIO_MAX = 500
 
-    test =  AudioTextDataset(AUDIO_DIR , TEXT_DIR, 'test', MAX_LEN, AUDIO_MAX)
-    print(test[0]['anchor'].shape)
-    print(test[0]['pos_input_ids'].shape)
-    print(test[0]['neg_input_ids'].shape)
+    test =  AudioTextDataset(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, filter_audio_save = False)
+    print(test[4]['anchor'].shape)
+    print(test[4]['pos_input_ids'].shape)
+    print(test[4]['neg_input_ids'].shape)
 
     data_loader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
     example = next(iter(data_loader))

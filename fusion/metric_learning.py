@@ -16,10 +16,10 @@ class MLEmbedModel(nn.Module):
         self.device = device
 
         if reference_style == 'gst':
-            self.reference_encoder = ReferenceEncoder(idim=6)
+            self.reference_encoder = ReferenceEncoder(idim=489)
             self.audio_encoder = StyleTokenLayer()
         else:
-            self.reference_encoder = ReferenceEncoder(idim=6, gru_units=self.ndim*2)
+            self.reference_encoder = ReferenceEncoder(idim=489, gru_units=self.ndim*2)
             self.audio_encoder = VAE_StyleTokenLayer(gru_units=self.ndim*2)
 
 
@@ -77,8 +77,8 @@ class MLEmbedModel(nn.Module):
         triplet_loss = self.triplet_loss(audio_embed, text_positive_embed, text_negative_embed)
         triplet_distance_loss = self.triplet_distance_loss(audio_embed, text_positive_embed, text_negative_embed)
 
-        audio_embed = audio_embed.detach().numpy()
-        text_positive_embed = text_positive_embed.detach().numpy()
+        audio_embed = audio_embed.cpu().numpy()
+        text_positive_embed = text_positive_embed.cpu().numpy()
 
         cosine_similarity = paired_cosine_distances(audio_embed, text_positive_embed)
         manhattan_distances = paired_manhattan_distances(audio_embed, text_positive_embed)
@@ -105,8 +105,9 @@ if __name__ == "__main__":
 
     # test =  AudioTextDataset(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX)
     data_loader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
-    example = next(iter(data_loader))
 
+    example = next(iter(data_loader))
+    
     model = MLEmbedModel(ndim=MAX_LEN)
     print(model(example))
     print(model.evaluate(example))

@@ -17,6 +17,7 @@ class AudioTextDataset(data.Dataset):
         self.mel_spec = MelSpectrogram()
 
         if filter_audio_save == True:
+            print("Filter & Save audio sample with tag")
             self.filter_audio_save_mel()
 
         self.total_audio, self.total_tags, self.len = self.load_mel()
@@ -67,6 +68,8 @@ class AudioTextDataset(data.Dataset):
             data = defaultdict(list)
 
             audio = self.audio_dataset[i]['audio']
+            if audio.size == 3:
+                audio = audio.squeeze(0)
             audio_tag = self.audio_dataset[i]['label']
             path = self.audio_dataset.labels['PATH'].values[i]
 
@@ -136,12 +139,12 @@ if __name__ == "__main__":
     MAX_LEN = 512
     AUDIO_MAX = 500
 
-    test =  AudioTextDataset(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, filter_audio_save = False)
+    test =  AudioTextDataset(AUDIO_DIR , TEXT_DIR, 'test', MAX_LEN, AUDIO_MAX, filter_audio_save = False)
     print(test[4]['anchor'].shape)
     print(test[4]['pos_input_ids'].shape)
     print(test[4]['neg_input_ids'].shape)
 
-    data_loader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
+    data_loader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'train', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
     example = next(iter(data_loader))
     print(example['anchor'].shape)
     print(example['pos_input_ids'].shape)

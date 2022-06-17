@@ -63,7 +63,7 @@ class OnMemoryDataset(MTATDataset):
 
 
 class JamendoDataset(data.Dataset):
-    def __init__(self, dir_path, split='train', sr=16000, audio_max=500):
+    def __init__(self, dir_path, split='train', sr=16000, audio_max=500, save_data=False):
         self.dir = dir_path
         self.sr = sr
         self.audio_max = audio_max
@@ -80,7 +80,8 @@ class JamendoDataset(data.Dataset):
             test = self.read_jamendo(self.dir + "autotagging_moodtheme-test.tsv")
             self.labels = pd.concat([train, valid, test])
 
-        self.pre_preprocess_and_save_data()
+        if save_data:
+            self.pre_preprocess_and_save_data()
 
     def __len__(self):
         return len(self.labels)
@@ -108,9 +109,11 @@ class JamendoDataset(data.Dataset):
 
     def pre_preprocess_and_save_data(self):
 
-        print("audio sample Saving & Load")
+        print("Saving & Load audio sample")
 
         for i in range(len(self.labels['PATH'])):
+            print(i)
+
             data = defaultdict(list)
 
             x = self.labels['PATH'].values[i]
@@ -118,20 +121,24 @@ class JamendoDataset(data.Dataset):
             if os.path.exists(self.dir + x.split('.')[0] + '.pt') == True:
                 pass
             else:
-                audio_sample, sr = torchaudio.load(self.dir + x, num_frames=self.sr * self.audio_max)
-
-                if len(audio_sample) > 1:
-                    audio_sample = audio_sample.mean(dim=0)
+                audio_sample, sr = torchaudio.load(self.dir + x)
 
                 if sr != self.sr:
                     audio_sample = torchaudio.functional.resample(audio_sample, orig_freq=sr, new_freq=self.sr)
+
+                audio_sample = audio_sample.mean(dim=0)
+
+                if len(audio_sample) > self.sr * self.audio_max:
+                    audio_sample = audio_sample[:self.sr * self.audio_max]
+                elif len(audio_sample) < self.sr * self.audio_max:
+                    audio_sample = torch.concat([audio_sample, torch.zeros(self.sr * self.audio_max - len(audio_sample))])
 
                 data['audio'].append(audio_sample)
                 data['label'].append(self.labels['TAGS'][i])
 
                 torch.save(data, self.dir + x.split('.')[0] + '.pt')
 
-        print("Saving complete!")
+        print("Saving & Load complete!")
 
     def load_audio(self):
 
@@ -140,11 +147,10 @@ class JamendoDataset(data.Dataset):
         for audio_path in self.labels['PATH']:
             audio_sample, sr = torchaudio.load(self.dir + audio_path, num_frames=self.sr * self.audio_max)
 
-            if len(audio_sample) > 1:
-                audio_sample = audio_sample.mean(dim=0)
-
             if sr != self.sr:
                 audio_sample = torchaudio.functional.resample(audio_sample, orig_freq=sr, new_freq=self.sr)
+
+            audio_sample = audio_sample.mean(dim=0)
 
             total_audio_datas.append(audio_sample)
 
@@ -160,8 +166,12 @@ class JamendoDataset(data.Dataset):
 
         audio_path = self.dir + self.labels['PATH'].iloc[idx].split('.')[0] + '.pt'
         audio_sample, label = torch.load(audio_path).values()
+        audio_sample = audio_sample[0]
 
-        return {"audio" : audio_sample[0],
+        if audio_sample.size() != 1:
+            audio_sample = audio_sample.squeeze(0)
+
+        return {"audio" : audio_sample,
                 "label" : label[0]
         }
 
@@ -171,7 +181,7 @@ class MelSpectrogram(nn.Module):
                  sr=16000,
                  n_fft = 1024,
                  hop_length = 512,
-                 n_mels = 48):
+                 n_mels = 80):
         super().__init__()
         self.mel_converter = torchaudio.transforms.MelSpectrogram(sample_rate=sr,
                                                                   n_fft=n_fft,
@@ -212,7 +222,7 @@ if __name__ == "__main__":
     NUM_MAX_DATA = 16
     AUDIO_MAX = 500
 
-    example = JamendoDataset(JAMENDO_DIR, 'train', AUDIO_MAX)
+    example = JamendoDataset(JAMENDO_DIR, 'test', AUDIO_MAX, save_data=False)
     print(example[4]['audio'].shape)
     print(example[4]['label'])
 

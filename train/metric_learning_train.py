@@ -94,7 +94,7 @@ def main():
         optimizer = torch.optim.AdamW(params=model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
         for epoch in range(args.epochs):
-            train(model, optimizer, train_dataloader, logger, epoch)
+            # train(model, optimizer, train_dataloader, logger, epoch)
             loss, triplet_loss, triplet_distance_loss, cosine_similarity, manhattan_distance, euclidean_distance  = evaluate(model,valid_dataloader, logger, epoch)
 
             if min_loss > loss:
@@ -139,30 +139,39 @@ def evaluate(model,valid_dataloader, logger, epoch):
         losses = 0
         triplet_losses = 0
         triplet_distance_losses = 0
-        cosine_similarities = 0,
-        manhattan_distances = 0,
+        cosine_similarities = 0
+        manhattan_distances = 0
         euclidean_distances = 0
 
-        for batch in valid_dataloader:
+        for idx, batch in tqdm(enumerate(valid_dataloader)):
             score = model.evaluate(batch)
 
             loss = score['loss'].item()
             losses += loss
+            logger.add_scalar('valid/loss', loss, idx)
+
+            tqdm_valid.set_description('loss is {:.2f}'.format(loss))
+            tqdm_valid.update()
 
             triplet_loss = score['triplet_loss'].item()
             triplet_losses += triplet_loss
+            logger.add_scalar('valid/triplet_loss', triplet_loss, idx)
 
             triplet_distance_loss = score['triplet_distance_loss'].item()
             triplet_distance_losses += triplet_distance_loss
+            logger.add_scalar('valid/triplet_distance_loss', triplet_distance_loss, idx)
 
             cosine_similarity = score['cosine_similarity'].item()
             cosine_similarities += cosine_similarity
+            logger.add_scalar('valid/cosine_similarity', cosine_similarity, idx)
 
             manhattan_distance = score['manhattan_distance'].item()
             manhattan_distances += manhattan_distance
+            logger.add_scalar('valid/manhattan_distance', manhattan_distance, idx)
 
             euclidean_distance = score['euclidean_distance'].item()
             euclidean_distances += euclidean_distance
+            logger.add_scalar('valid/euclidean_distance', euclidean_distance, idx)
 
         losses = losses/len(valid_dataloader)
         triplet_losses = triplet_losses / len(valid_dataloader)

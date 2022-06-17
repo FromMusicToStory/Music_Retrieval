@@ -1,15 +1,8 @@
 import argparse
 from tqdm import tqdm
 
-import torch
-import numpy as np
-from torch.utils.data.dataloader import DataLoader
-from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, confusion_matrix
-
 from fusion.metric_learning import *
 from config import *
-
-
 
 
 def parse_args():
@@ -68,8 +61,8 @@ def main():
     BATCH_SIZE = args.batch
 
     if args.train == True:
-        train_dataset = create_data_loader(AUDIO_DIR , TEXT_DIR, 'train', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
-        valid_dataset = create_data_loader(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
+        train_dataloader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'train', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
+        valid_dataloader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
 
         seed = 1024
         torch.manual_seed(seed)
@@ -86,9 +79,8 @@ def main():
         optimizer = torch.optim.AdamW(params=model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
         for epoch in range(args.epochs):
-            dataloader = DataLoader(train_dataset, batch_size=args.batch, shuffle=args.shuffle)
-            train(model, optimizer, dataloader)
-            loss, triplet_loss, triplet_distance_loss, cosine_similarity, manhattan_distance, euclidean_distance  = evaluate(model,valid_dataset)
+            train(model, optimizer, train_dataloader)
+            loss, triplet_loss, triplet_distance_loss, cosine_similarity, manhattan_distance, euclidean_distance  = evaluate(model,valid_dataloader)
 
             if min_loss > loss:
                 temp = min_loss

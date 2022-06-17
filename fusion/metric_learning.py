@@ -103,11 +103,8 @@ if __name__ == "__main__":
     MAX_LEN = 512
     AUDIO_MAX = 500
 
-    # test =  AudioTextDataset(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX)
     data_loader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
-
     example = next(iter(data_loader))
     
     model = MLEmbedModel(ndim=MAX_LEN)
     print(model(example))
-    print(model.evaluate(example))

@@ -1,8 +1,8 @@
 import argparse
 from tqdm import tqdm
 
-from fusion.metric_learning import *
-from config import *
+from metric_learning import *
+from train.config import *
 
 from tensorboardX import SummaryWriter
 
@@ -101,7 +101,7 @@ def main():
                 temp = min_loss
                 min_loss = loss
                 if 'result' not in os.listdir():
-                    os.mkdir('result')
+                    os.mkdir('../train/result')
                     torch.save(model,'../result/{}_epoch{}.pt'.format('metric_with_embed', epoch))
                     print("-"*10,"Saving Model - loss {:.4f} ->  {:.4f}".format(temp, min_loss),"-"*10)
 

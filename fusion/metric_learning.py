@@ -9,10 +9,11 @@ from pytorch_metric_learning import losses
 
 
 class MLEmbedModel(nn.Module):
-    def __init__(self, ndim, reference_style = 'gst', margin =0.2):
+    def __init__(self, ndim, reference_style = 'gst', margin =0.2, device ='cpu'):
         super().__init__()
         self.ndim  = ndim
         self.text_encoder = TextEncoder(output_dim=self.ndim)
+        self.device = device
 
         if reference_style == 'gst':
             self.reference_encoder = ReferenceEncoder(idim=6)
@@ -32,15 +33,21 @@ class MLEmbedModel(nn.Module):
 
 
     def audio_to_embedding(self, batch):
-        ref_embed = self.reference_encoder(batch['anchor'])
+        anchor = batch['anchor'].to(self.device)
+        ref_embed = self.reference_encoder(anchor)
         style_token = self.audio_encoder(ref_embed)
 
         return style_token
 
 
     def text_to_embedding(self, batch):
-        positive_embed = self.text_encoder(batch['pos_input_ids'], batch['pos_mask'])
-        negative_embed = self.text_encoder(batch['neg_input_ids'], batch['neg_mask'])
+        pos_input_ids = batch['pos_input_ids'].to(self.device)
+        pos_mask = batch['pos_mask'].to(self.device)
+        neg_input_ids = batch['neg_input_ids'].to(self.device)
+        neg_mask = batch['neg_mask'].to(self.device)
+
+        positive_embed = self.text_encoder(pos_input_ids, pos_mask)
+        negative_embed = self.text_encoder(neg_input_ids, neg_mask)
 
         return positive_embed, negative_embed
 

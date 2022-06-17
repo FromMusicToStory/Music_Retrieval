@@ -69,9 +69,9 @@ def main():
         np.random.seed(seed)
         random.seed(seed)
 
-        model = MLEmbedModel(ndim=MAX_LEN)
         device = args.cuda
         print('---------------------', device)
+        model = MLEmbedModel(ndim=MAX_LEN, device=device)
         model = model.to(device)
         print('---config---')
         print(args)
@@ -87,7 +87,7 @@ def main():
                 min_loss = loss
                 if 'result' not in os.listdir():
                     os.mkdir('result')
-                    torch.save(model,'./result/{}_epoch{}.pt'.format(args.model_name,epoch))
+                    torch.save(model,'./result/{}_epoch{}.pt'.format('metric_with_embed',epoch))
                     print("-"*10,"Saving Model - loss {:.4f} ->  {:.4f}".format(temp, min_loss),"-"*10)
 
 
@@ -96,7 +96,7 @@ def train(model, optimizer, dataloader):
     model.train()
     tqdm_train = tqdm(total=len(dataloader), position=1)
 
-    for batch in enumerate(dataloader):
+    for batch in dataloader:
         _, _, _, loss = model(batch)
         tqdm_train.set_description('loss is {:.2f}'.format(loss.item()))
         tqdm_train.update()
@@ -121,6 +121,7 @@ def evaluate(model,valid_dataloader):
         euclidean_distances = 0
 
         for batch in valid_dataloader:
+
             score = model.evaulate(batch)
 
             loss = score['loss'].item()
@@ -147,7 +148,6 @@ def evaluate(model,valid_dataloader):
         cosine_similarities = cosine_similarities / len(valid_dataloader)
         manhattan_distances = manhattan_distances / len(valid_dataloader)
         euclidean_distances = euclidean_distances / len(valid_dataloader)
-
 
 
         print('Validation Result: Loss - {:.4f} | triplet_loss - {:.3f} |\

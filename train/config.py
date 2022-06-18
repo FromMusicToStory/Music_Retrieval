@@ -9,5 +9,6 @@ metric_embedding_train_config = {
     'weight_decay': 1e-4,
     'accumulation_steps': 8,
     'cuda': 'cuda:0',
-    'log_dir': 'result/tensorboard'
+    'log_dir': '../train/result/tensorboard',
+    'model_name': 'ml_with_embed_train_data'
 }

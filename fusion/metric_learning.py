@@ -1,11 +1,8 @@
-import torch
-from torch import nn
 from text.model import *
 from audio.reference_encoder_gst import *
 from audio.reference_encoder_vae import *
-from metric_embedding_dataloader import *
+from fusion.metric_embedding_dataloader import *
 from sklearn.metrics.pairwise import *
-from pytorch_metric_learning import losses
 
 
 class MLEmbedModel(nn.Module):

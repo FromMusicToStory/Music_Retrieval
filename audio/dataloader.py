@@ -112,10 +112,7 @@ class JamendoDataset(data.Dataset):
         print("Saving & Load audio sample")
 
         for i in range(len(self.labels['PATH'])):
-            print(i)
-
             data = defaultdict(list)
-
             x = self.labels['PATH'].values[i]
 
             if os.path.exists(self.dir + x.split('.')[0] + '.pt') == True:
@@ -125,7 +122,6 @@ class JamendoDataset(data.Dataset):
 
                 if sr != self.sr:
                     audio_sample = torchaudio.functional.resample(audio_sample, orig_freq=sr, new_freq=self.sr)
-
                 audio_sample = audio_sample.mean(dim=0)
 
                 if len(audio_sample) > self.sr * self.audio_max:
@@ -149,7 +145,6 @@ class JamendoDataset(data.Dataset):
 
             if sr != self.sr:
                 audio_sample = torchaudio.functional.resample(audio_sample, orig_freq=sr, new_freq=self.sr)
-
             audio_sample = audio_sample.mean(dim=0)
 
             total_audio_datas.append(audio_sample)
@@ -222,7 +217,7 @@ if __name__ == "__main__":
     NUM_MAX_DATA = 16
     AUDIO_MAX = 500
 
-    example = JamendoDataset(JAMENDO_DIR, 'test', AUDIO_MAX, save_data=False)
+    example = JamendoDataset(JAMENDO_DIR, 'train', AUDIO_MAX, save_data=False)
     print(example[4]['audio'].shape)
     print(example[4]['label'])
 

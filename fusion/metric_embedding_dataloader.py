@@ -133,13 +133,13 @@ def create_data_loader(AUDIO_DIR , TEXT_DIR, split, max_len, audio_max, batch_si
 
 
 if __name__ == "__main__":
-    AUDIO_DIR = 'dataset/mtg-jamendo-dataset/'
-    TEXT_DIR = 'dataset/Story_dataset/'
+    AUDIO_DIR = '../dataset/mtg-jamendo-dataset/'
+    TEXT_DIR = '../dataset/Story_dataset/'
     BATCH_SIZE = 32
     MAX_LEN = 512
     AUDIO_MAX = 500
 
-    test =  AudioTextDataset(AUDIO_DIR , TEXT_DIR, 'test', MAX_LEN, AUDIO_MAX, filter_audio_save = False)
+    test =  AudioTextDataset(AUDIO_DIR , TEXT_DIR, 'train', MAX_LEN, AUDIO_MAX, filter_audio_save = False)
     print(test[4]['anchor'].shape)
     print(test[4]['pos_input_ids'].shape)
     print(test[4]['neg_input_ids'].shape)
@@ -149,3 +149,6 @@ if __name__ == "__main__":
     print(example['anchor'].shape)
     print(example['pos_input_ids'].shape)
     print(example['neg_input_ids'].shape)
+
+    for i, data in enumerate(data_loader):
+        print(i, data['anchor'].shape)

@@ -1,6 +1,7 @@
 import argparse
 from tqdm import tqdm
 
+from text.model import *
 from metric_learning import *
 from train.config import *
 
@@ -56,6 +57,12 @@ def parse_args():
         help='log_dir to save'
     )
 
+    parser.add_argument(
+        '--model_name',
+        default=metric_embedding_train_config['model_name'],
+        help='model name to save'
+    )
+
     args = parser.parse_args()
     return args
 
@@ -74,8 +81,8 @@ def main():
     BATCH_SIZE = args.batch
 
     if args.train == True:
-        train_dataloader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
-        valid_dataloader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'test', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
+        train_dataloader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'train', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
+        valid_dataloader = create_data_loader(AUDIO_DIR , TEXT_DIR, 'valid', MAX_LEN, AUDIO_MAX, BATCH_SIZE)
 
         print('data loading done')
 
@@ -102,7 +109,7 @@ def main():
                 min_loss = loss
                 if 'result' not in os.listdir():
                     os.mkdir('../train/result')
-                    torch.save(model,'../result/{}_epoch{}.pt'.format('metric_with_embed', epoch))
+                    torch.save(model,'../train/result/{}_epoch{}.pt'.format(args.model_name, epoch))
                     print("-"*10,"Saving Model - loss {:.4f} ->  {:.4f}".format(temp, min_loss),"-"*10)
 
     logger.flush()

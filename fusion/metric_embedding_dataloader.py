@@ -149,6 +149,3 @@ if __name__ == "__main__":
     print(example['anchor'].shape)
     print(example['pos_input_ids'].shape)
     print(example['neg_input_ids'].shape)
-
-    for i, data in enumerate(data_loader):
-        print(i, data['anchor'].shape)

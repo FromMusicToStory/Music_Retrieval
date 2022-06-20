@@ -6,8 +6,8 @@ from fusion.metric_embedding_dataloader import JamendoDataset, StoryTextDataset
 from text.dataloader import *
 from sklearn.metrics.pairwise import *
 
-from multi_model import MetricModel
-from multi_dataloader import AudioOnlyDataset
+from multi.multi_model import MetricModel
+from multi.multi_dataloader import AudioOnlyDataset
 import argparse
 
 

@@ -91,3 +91,4 @@ if __name__ == '__main__':
     print(example['input_ids'].shape)
     print(example['mask'].shape)
     print(example['target'].shape)
+

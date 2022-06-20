@@ -1,7 +1,6 @@
 import argparse
 from tqdm import tqdm
 
-from text.model import *
 from metric_learning import *
 from train.config import *
 
@@ -101,9 +100,10 @@ def main():
         optimizer = torch.optim.AdamW(params=model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
         for epoch in range(args.epochs):
+            print('epoch: ', epoch)
             train(model, optimizer, train_dataloader, logger, epoch)
             loss, triplet_loss, triplet_distance_loss, cosine_similarity, manhattan_distance, euclidean_distance  = evaluate(model,valid_dataloader, logger, epoch)
-
+            '''
             if min_loss > loss:
                 temp = min_loss
                 min_loss = loss
@@ -111,6 +111,11 @@ def main():
                     os.mkdir('../train/result')
                     torch.save(model,'../train/result/{}_epoch{}.pt'.format(args.model_name, epoch))
                     print("-"*10,"Saving Model - loss {:.4f} ->  {:.4f}".format(temp, min_loss),"-"*10)
+            '''
+            if  os.path.exists('../train/result') == False:
+                os.mkdir('../train/result')
+            torch.save(model, '../train/result/{}_epoch{}_loss{:.4f}.pt'.format(args.model_name, epoch, loss))
+            print("-" * 10, "Saving Model - loss {:.4f} ".format(min_loss), "-" * 10)
 
     logger.flush()
 

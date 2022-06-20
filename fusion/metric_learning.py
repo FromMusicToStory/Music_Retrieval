@@ -1,4 +1,4 @@
-from text.model import *
+from text.model import  *
 from audio.reference_encoder_gst import *
 from audio.reference_encoder_vae import *
 from fusion.metric_embedding_dataloader import *

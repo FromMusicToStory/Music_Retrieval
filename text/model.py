@@ -21,13 +21,13 @@ class TextEncoder(nn.Module):
         last_hidden_state = output.last_hidden_state
 
         if return_hidden_states:
-            return last_hidden_state       # batch, max_len, hidden_size(768)
+            return last_hidden_state            # batch, max_len, hidden_size(768)
 
-        x = last_hidden_state[:, 0, :]     # batch, max_len, hidden_size
-        x = self.projection(x)             # batch, output_dim
+        x = last_hidden_state[:, 0, :]          # batch, max_len, hidden_size
+        x = self.projection(x)                  # batch, output_dim
 
         if do_clf:
-            x = self.clf(x)                # batch, num_label
+            x = self.clf(x)                     # batch, num_label
 
         return x
 
@@ -39,6 +39,7 @@ if __name__ == "__main__":
     TEXT_DIR = '../dataset/Story_dataset/'
     BATCH_SIZE = 16
     MAX_LEN = 512
+
     train_data_loader = create_text_data_loader(TEXT_DIR, 'train', MAX_LEN, BATCH_SIZE)
 
     example = next(iter(train_data_loader))

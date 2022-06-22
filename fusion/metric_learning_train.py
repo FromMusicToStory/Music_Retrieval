@@ -85,10 +85,10 @@ def main():
 
         print('data loading done')
 
-        seed = 1024
-        torch.manual_seed(seed)
-        np.random.seed(seed)
-        random.seed(seed)
+        # seed = 1024
+        # torch.manual_seed(seed)
+        # np.random.seed(seed)
+        # random.seed(seed)
 
         device = args.cuda
         print('---------------------', device)

@@ -178,11 +178,11 @@ def evaluate(model,valid_dataloader, logger, epoch):
             logger.add_scalar('valid/cosine_similarity', cosine_similarity, idx)
 
             manhattan_distance = score['manhattan_distance'].item()
-            manhattan_distances += manhattan_distance
+            manhattan_distances -= manhattan_distance
             logger.add_scalar('valid/manhattan_distance', manhattan_distance, idx)
 
             euclidean_distance = score['euclidean_distance'].item()
-            euclidean_distances += euclidean_distance
+            euclidean_distances -= euclidean_distance
             logger.add_scalar('valid/euclidean_distance', euclidean_distance, idx)
 
         losses = losses/len(valid_dataloader)

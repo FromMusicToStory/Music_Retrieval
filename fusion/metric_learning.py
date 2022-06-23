@@ -49,6 +49,14 @@ class MLEmbedModel(nn.Module):
         return positive_embed, negative_embed
 
 
+    def text_to_embedding_only(self, input_ids, atten_mask):
+        input_ids = input_ids.to(self.device)
+        atten_mask = atten_mask.to(self.device)
+        embed = self.text_encoder(input_ids, atten_mask)
+
+        return embed
+
+
     def forward(self, batch):
         if batch != None:
             audio_embed = self.audio_to_embedding(batch)

@@ -4,40 +4,26 @@ from torch.utils.data import DataLoader
 from torch.utils.data import default_collate
 
 from audio.reference_encoder_gst import StyleEncoder  # , VAE_StyleEncoder
-from audio.dataloader import MelDataset
-from multi_dataloader import AudioTextDataset
+from multi_dataset import AudioTextDataset
 from text.model import TextEncoder
-from text.dataloader import TextClassification_Dataset
+from text.dataloader import *
 from sklearn.metrics.pairwise import *
 
-from word2vec import W2V
-
 import argparse
-from tqdm import tqdm
+import tqdm
 
 from tensorboardX import SummaryWriter
 
 
-def create_data_loader(modal, data_dir, split, batch_size, num_workers, **kwargs):
-    if modal == 'text':
-        dataset = TextClassification_Dataset(data_dir, split, max_len=kwargs['max_len'])
-    else:
-        if split == 'train':
-            dataset = MelDataset(data_dir, split, num_max_data=kwargs['data_num'])
-        else:
-            dataset = MelDataset(data_dir, split)
-
-    return DataLoader(dataset, batch_size=batch_size, num_workers=num_workers)
-
-
 class MetricModel(nn.Module):
-    def __init__(self, style_encoder='gst', n_dim=256, out_dim=64):
+    def __init__(self, style_encoder='gst', n_dim=256, out_dim=64, device='cuda'):
         super(MetricModel, self).__init__()
         if style_encoder == 'gst':
             self.style_encoder = StyleEncoder(idim=15626)
         # else :
         #     self.style_encoder = VAE_StyleEncoder(idim=15626)
         self.text_encoder = TextEncoder()
+        self.device = device
 
         # audio MLP
         self.audio_mlp = nn.Sequential(
@@ -89,14 +75,20 @@ class MetricModel(nn.Module):
         return loss.mean()
 
     def audio_to_embedding(self, batch):
-        emb = self.style_encoder(batch['mel'])
+        mel = batch['mel'].to(self.device)
+        emb = self.style_encoder(mel)
         emb = self.audio_mlp(emb)
         return emb
 
     def text_to_embedding(self, batch):
-        pos = self.text_encoder(batch['text']['input_ids'], batch['text']['attention_mask'])
+        pos_input_ids = batch['text']['input_ids'].to(self.device)
+        pos_mask = batch['text']['attention_mask'].to(self.device)
+        neg_input_ids = batch['neg_text']['input_ids'].to(self.device)
+        neg_mask = batch['neg_text']['attention_mask'].to(self.device)
+
+        pos = self.text_encoder(pos_input_ids, pos_mask)
         pos = self.text_mlp(pos)
-        neg = self.text_encoder(batch['neg_text']['input_ids'], batch['neg_text']['attention_mask'])
+        neg = self.text_encoder(neg_input_ids, neg_mask)
         neg = self.text_mlp(neg)
         return pos, neg
 
@@ -148,9 +140,9 @@ def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     # load data
-    train_dataset = AudioTextDataset(audio_dir=args.audio_dir, text_dir=args.text_dir, split='train', device=device)
+    train_dataset = AudioTextDataset(audio_dir=args.audio_dir, text_dir=args.text_dir)
     train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size)
-    valid_dataset = AudioTextDataset(audio_dir=args.audio_dir, text_dir=args.text_dir, split='valid', device=device)
+    valid_dataset = AudioTextDataset(audio_dir=args.audio_dir, text_dir=args.text_dir)
     valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size)
 
     print('data loading done')
@@ -248,11 +240,11 @@ def validate(model, valid_dataloader, logger, epoch):
             logger.add_scalar('valid/cosine_similarity', cosine_similarity, idx)
 
             manhattan_distance = score['manhattan_distance'].item()
-            manhattan_distances += manhattan_distance
+            manhattan_distances -= manhattan_distance
             logger.add_scalar('valid/manhattan_distance', manhattan_distance, idx)
 
             euclidean_distance = score['euclidean_distance'].item()
-            euclidean_distances += euclidean_distance
+            euclidean_distances -= euclidean_distance
             logger.add_scalar('valid/euclidean_distance', euclidean_distance, idx)
 
         losses = losses / len(valid_dataloader)

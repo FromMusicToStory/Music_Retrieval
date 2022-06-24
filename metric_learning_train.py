@@ -1,7 +1,7 @@
 import argparse
 from tqdm import tqdm
 
-from metric_learning import *
+from fusion.metric_learning import *
 from train.config import *
 
 from tensorboardX import SummaryWriter

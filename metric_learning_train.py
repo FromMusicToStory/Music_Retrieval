@@ -112,9 +112,9 @@ def main():
                     torch.save(model,'../train/result/{}_epoch{}.pt'.format(args.model_name, epoch))
                     print("-"*10,"Saving Model - loss {:.4f} ->  {:.4f}".format(temp, min_loss),"-"*10)
             '''
-            if  os.path.exists('../train/result') == False:
-                os.mkdir('../train/result')
-            torch.save(model, '../train/result/{}_epoch{}_loss{:.4f}.pt'.format(args.model_name, epoch, loss))
+            if  os.path.exists('train/result') == False:
+                os.mkdir('train/result')
+            torch.save(model, 'train/result/{}_epoch{}_loss{:.4f}.pt'.format(args.model_name, epoch, loss))
             print("-" * 10, "Saving Model - loss {:.4f} ".format(min_loss), "-" * 10)
 
     logger.flush()

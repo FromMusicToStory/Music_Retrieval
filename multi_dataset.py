@@ -86,7 +86,7 @@ class AudioTextDataset(Dataset):
         elif len(mono) < self.sr * self.audio_max:
             mono = torch.concat([mono, torch.zeros(self.sr * self.audio_max - len(mono))])
         mel = self.mel_converter(mono)
-        mel_file = os.path.join(self.audio_dir, audio_path.replace("mp3","pt"))
+        mel_file = os.path.join(self.audio_dir, audio_path.split('.')[0] + ("_multi.pt"))
         torch.save(mel,mel_file)
         return mel
 
@@ -109,18 +109,18 @@ class AudioTextDataset(Dataset):
 
     def __getitem__(self, idx):
         audio = self.audio_data.iloc[idx]
-        if os.path.exists(os.path.join(self.audio_dir, audio['path'].replace("mp3","pt"))):
-            mel = self.load_mel(audio['path'].replace("mp3","pt"))
+        if os.path.exists(os.path.join(self.audio_dir, audio['path'].split('.')[0] + ("_multi.pt"))):
+            mel = self.load_mel(audio['path'].split('.')[0] + ("_multi.pt"))
         else :
             mel = self.load_audio_to_mel(audio['path'])
 
         return {
             'mel': mel ,
             'mel_label': self.get_word_vector(audio['tag']),
-            'text': self.get_random_text(audio['text_tag']),  # randomly chosen text sample (positive)
+            'text': self.get_random_text(audio['text_tag']),            # randomly chosen text sample (positive)
             'text_label': self.get_word_vector(audio['text_tag']),
             'neg_mel': self.get_neg(audio['text_tag'], modal='audio'),  # randomly chosen negative sample
-            'neg_text': self.get_neg(audio['text_tag'], modal='text')  # randomly chosen negative text sample
+            'neg_text': self.get_neg(audio['text_tag'], modal='text')   # randomly chosen negative text sample
         }
 
     def read_jamendo(self, audio_path):
@@ -138,8 +138,7 @@ class AudioTextDataset(Dataset):
         for i in range(1, len(data)):
             line = data[i][:-1].split("\t")
 
-            path = os.path.join(split, line[3].replace("/", "-"))
-
+            path = line[3]
             tag = line[5:]
             tag = [t.split('---')[-1] for t in tag]
 
@@ -232,8 +231,8 @@ class AudioTextDataset(Dataset):
         else:
             selected = self.audio_data[self.audio_data['track_id'] == selected]['path']
             selected = list(selected)[0]
-            if os.path.exists(os.path.join(self.audio_dir,selected.replace("mp3","pt"))):
-                selected = self.load_mel(selected.replace("mp3","pt"))
+            if os.path.exists(os.path.join(self.audio_dir, selected.split('.')[0] + ("_multi.pt"))):
+                selected = self.load_mel(selected.split('.')[0] + ("_multi.pt"))
             else:
                 selected = self.load_audio_to_mel(selected)
 
@@ -242,7 +241,7 @@ class AudioTextDataset(Dataset):
 
 if __name__ == '__main__':
     os.environ['TOKENIZERS_PARALLELISM']='true'
-    audio_dir = 'dataset/MTG/'
+    audio_dir = 'dataset/mtg-jamendo-dataset/'
     text_dir = 'dataset/Story_dataset/'
 
     dataset = AudioTextDataset(audio_dir=audio_dir, text_dir=text_dir)

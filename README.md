@@ -58,9 +58,6 @@ bash ./run_train.sh
 <br>
 
 ## References
-- 
-- VAE: https://github.com/jinhan/tacotron2-vae/tree/5fbe8ff968c87130638c60d588b229889725a55b
-
 - Minz Won, Justin Salamon, Nicholas J. Bryan, Gautham J. Mysore, and Xavier Serra
 ```
 @inproceedings{won2021emotion,

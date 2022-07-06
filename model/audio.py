@@ -203,7 +203,7 @@ class VAE_StyleTokenLayer(nn.Module):
 
         return style_embed, mu, logvar, z
 
-    
+''' 
 @inproceedings{watanabe2018espnet,
   author={Shinji Watanabe and Takaaki Hori and Shigeki Karita and Tomoki Hayashi and Jiro Nishitoba and Yuya Unno and Nelson {Enrique Yalta Soplin} and Jahn Heymann and Matthew Wiesner and Nanxin Chen and Adithya Renduchintala and Tsubasa Ochiai},
   title={{ESPnet}: End-to-End Speech Processing Toolkit},
@@ -252,3 +252,4 @@ class VAE_StyleTokenLayer(nn.Module):
   journal={arXiv preprint arXiv:2111.14706},
   year={2021}
 }
+'''

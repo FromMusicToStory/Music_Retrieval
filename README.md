@@ -13,12 +13,18 @@
 ### Query (Audio) Encoder
 - ① GST style Reference Encoder
 <img src = "/img/Reference%20Encoder.PNG">
-- ① VAE style Reference Encoder
+- ② VAE style Reference Encoder
 <img src = "/img/Reference%20Encoder_VAE.PNG">
 
 <br>
 
-##Set up Environment
+## Inference
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1-lNsxA9rHXzKLF21S4vWmtvNT1MmLk5G?usp=sharing)
+
+<br>
+
+## Set up Environment
 ```
 pip install -r requirements.txt
 ```
@@ -37,7 +43,7 @@ pip install -r requirements.txt
 
 <br>
 
-### Training
+## Training
 
 1. two branch metric learning
 ```
@@ -48,9 +54,3 @@ bash ./run_twobranch_train.sh
 ```
 bash ./run_train.sh
 ```
-
-<br>
-
-### Inference
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1-lNsxA9rHXzKLF21S4vWmtvNT1MmLk5G?usp=sharing)

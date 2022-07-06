@@ -45,12 +45,12 @@ pip install -r requirements.txt
 
 ## Training
 
-1. two branch metric learning
+#### 1. two branch metric learning
 ```
 bash ./run_twobranch_train.sh
 ```
 
-2. three branch metric learning
+#### 2. three branch metric learning
 ```
 bash ./run_train.sh
 ```

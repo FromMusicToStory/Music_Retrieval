@@ -18,15 +18,6 @@ from dataset.audio import JamendoDataset, MelSpectrogram
 from dataset.text import StoryTextDataset
 
 
-
-
-
-
-
-
-
-
-
 class ThreeMultiDataset(Dataset):
     def __init__(self, audio_dir, text_dir, split='train', device='cpu',
                  sr=16000, n_fft=1024, hop_size=512, n_mels=80,
